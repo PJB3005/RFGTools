@@ -11,14 +11,30 @@ namespace FileCorruptionChecker
     class Program
     {
         static StreamWriter LogFile;
+        static uint CorruptedFileCount = 0;
+        static uint UnknownFormatCount = 0;
+        static uint IgnoredFileCount = 0;
+        static string[] IgnoredExtensionList = {".wav", ".txt", ".xml", ".xtbl", ".mtbl", ".lua",
+        ".gpeg_pc", ".gvbm_pc", ".gsmesh_pc", ".gtmesh_pc", ".gcmesh_pc", ".gcar_pc", ".xsb_pc",
+        ".xwb_pc", ".gefct_pc", ".gterrain_pc", ".vint_proj", ".scriptx", ".fsmib", ".png", ".dds",
+        ".dtodx", ".gtodx", ".NEW", ".gchk_pc", ".vint_xdoc"};
+
         static void Main(string[] args)
         { 
             LogFile = new StreamWriter(@"./RFG_File_Validation_Log.txt", false);
-            var Files = new DirectoryInfo(@"B:\RFG Unpack\Unpack\unpack1\");
+            var Files = new DirectoryInfo(@"B:\RFG Unpack\Unpack\unpack2\");
             Console.WriteLine("Checking for corrupted files in " + Files.Name + " and it's sub-folders...");
             WalkDirectoryTree(Files);
 
-            Console.WriteLine("Complete. Press any key to close.");
+            LogFile.WriteLine("Complete! Results:");
+            LogFile.WriteLine("Number of corrupted files: " + CorruptedFileCount.ToString());
+            LogFile.WriteLine("Number of unknown formats: " + UnknownFormatCount.ToString());
+   
+            Console.WriteLine("Complete! Results:");
+            Console.WriteLine("Number of corrupted files: " + CorruptedFileCount.ToString());
+            Console.WriteLine("Number of unknown formats: " + UnknownFormatCount.ToString());
+            Console.WriteLine("Number of ignored files: " + IgnoredFileCount.ToString());
+            Console.WriteLine("Press any key to close.");
             Console.ReadKey(); //Waits for keypress to exit.
         }
 
@@ -57,25 +73,31 @@ namespace FileCorruptionChecker
                     // where the file has been deleted since the call to TraverseTree().
 
                     //Console.WriteLine(fi.FullName);
+                    string Extension = File.Extension;
+                    if (ExtensionOnIgnoreList(File.Extension))
+                    {
+                        continue;
+                    }
                     var FileInfo = new FileInfo(File.FullName);
                     if (FileInfo.Length == 0)
                     {
                         Console.WriteLine(File.Name + " is corrupt, size is 0 bytes.");
                         LogFile.WriteLine(File.Name + " is corrupt, size is 0 bytes.");
+                        CorruptedFileCount++;
                         continue;
                     }
-                    string Extension = File.Extension;
                     var Stream = new FileStream(File.FullName, FileMode.Open);
                     var Reader = new BinaryReader(Stream);
                     uint Signature = Reader.ReadUInt32();
 
-                    //Unknowns: fsmib, gsmesh, csmesh, ccmesh, xwb_pc, xsb_pc
+                    //Unknowns: fsmib, gsmesh, csmesh, ccmesh, xwb_pc, xsb_pc, gterrain_pc
                     if(Extension == ".vpp_pc" || Extension == ".str2_pc")
                     {
                         if(Signature != 1367935694)
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".cpeg_pc" || Extension == ".cvbm_pc")
@@ -84,6 +106,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".asm_pc")
@@ -92,6 +115,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if(Extension == ".mat_pc")
@@ -100,6 +124,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".ccmesh_pc")
@@ -108,6 +133,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".csmesh_pc") 
@@ -116,6 +142,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".morph_pc")
@@ -124,6 +151,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".ccar_pc")
@@ -132,6 +160,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".anim_pc")
@@ -140,6 +169,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".rfgzone_pc" || Extension == ".layer_pc")
@@ -148,6 +178,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".vint_doc")
@@ -156,6 +187,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".vf3_pc")
@@ -164,6 +196,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".precache")
@@ -172,6 +205,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".cchk_pc")
@@ -180,6 +214,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".sim_pc")
@@ -188,6 +223,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".rig_pc")
@@ -196,6 +232,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (File.Name == "bitmaps_pc") //Special case
@@ -204,6 +241,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".fxo_kg")
@@ -212,6 +250,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".rfglocatext")
@@ -220,6 +259,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".vfdvp_pc")
@@ -228,14 +268,16 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
-                    else if (Extension == "rfgvp_pc") 
+                    else if (Extension == ".rfgvp_pc") 
                     {
                         if (Signature != 1868057136) //0JXo
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".cefct_pc")
@@ -244,6 +286,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".cstch_pc")
@@ -252,6 +295,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".ctmesh_pc")
@@ -260,6 +304,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".aud_pc")
@@ -268,6 +313,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".xgs_pc") 
@@ -276,6 +322,7 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else if (Extension == ".le_strings")
@@ -284,12 +331,14 @@ namespace FileCorruptionChecker
                         {
                             Console.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
                         }
                     }
                     else
                     {
                         Console.WriteLine(File.Name + " has an unknown or unregistered format extension.");
                         LogFile.WriteLine(File.Name + " has an unknown or unregistered format extension.");
+                        UnknownFormatCount++;
                     }
                     /*else if (Extension == ")
                     {
@@ -310,6 +359,18 @@ namespace FileCorruptionChecker
                     WalkDirectoryTree(dirInfo);
                 }
             }
+        }
+        static bool ExtensionOnIgnoreList(string Extension)
+        {
+            foreach(var Entry in IgnoredExtensionList)
+            {
+                if(Extension == Entry)
+                {
+                    IgnoredFileCount++;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
