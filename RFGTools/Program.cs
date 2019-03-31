@@ -14,6 +14,8 @@ namespace RFGFormats
             -a: Unpack all in folder, args: PackfileUnpacker.exe InputFolder [OutputFolder] ... If no OutputFolder provided, unpack to ./unpack/packfilename, perhaps with extension stripped
             Consider adding option to auto detect wanted behavior depending on if a folder or file is dropped on it.
             Have messagebox pop up to confirm action on activities which might take forever.
+            Add verbose option
+            Add recursive unpack option
             */
 
 
@@ -27,13 +29,24 @@ namespace RFGFormats
             var Packfile = new Packfile3();
             Packfile.Deserialize(PackfilePath, OutputPath);*/
 
-            FileInfo[] DataFolder = new DirectoryInfo(@"B:\RFG Unpack\data\").GetFiles();
+            //Todo: Validate vpp unpacks, then unpack all str2, get file types, and validate those
+            FileInfo[] DataFolder = new DirectoryInfo(@"B:\RFG Unpack\data\vehicles_r2\").GetFiles();
             foreach(var File in DataFolder)
             {
-                var Packfile = new Packfile3();
-                string PackfilePath = File.FullName;
-                string OutputFolderPath = File.Directory.Parent.FullName + @"\Unpack\unpack2\" + File.Name + @"\";
-                Packfile.Deserialize(PackfilePath, OutputFolderPath);
+                if(File.Extension == ".vpp_pc" || File.Extension == ".str2_pc")
+                {
+                    try
+                    {
+                        var Packfile = new Packfile3();
+                        string PackfilePath = File.FullName;
+                        string OutputFolderPath = File.Directory.Parent.FullName + @"\Unpack\unpack3\" + File.Name + @"\";
+                        Packfile.Deserialize(PackfilePath, OutputFolderPath);
+                    }
+                    catch (Exception Ex)
+                    {
+                        //MessageBox.Show("Exception caught while unpacking " + File.Name + ": " + Ex.Message);
+                    }
+                }
             }
             Console.WriteLine("Complete. Press any key to close.");
             Console.ReadKey(); //Waits for keypress to exit.
