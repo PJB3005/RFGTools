@@ -54,7 +54,7 @@ namespace RFGFormats
             string PackfileName = Path.GetFileName(PackfilePath);
             System.IO.Directory.CreateDirectory(OutputPath);
             Console.WriteLine("Extracting " + PackfileName + "...");
-            Console.WriteLine("Reading header data...");
+            Console.WriteLine(PackfileName + "> Reading header data...");
 
             var File = new BinaryReader(new FileStream(PackfilePath, FileMode.Open));
             Signature = File.ReadUInt32();
@@ -142,13 +142,15 @@ namespace RFGFormats
                 long DecompressedPosition = 0;
                 foreach (var Entry in DirectoryEntries.Select((Value, Index) => new { Index, Value }))
                 {
+                    DecompressedPosition = Entry.Value.DataOffset;
                     Console.Write(PackfileName + "> Extracting " + Filenames[Entry.Index].ToString() + "...");
                     var Writer = new BinaryWriter(System.IO.File.Create(OutputPath + Filenames[Entry.Index]));
+                    //Writer.Write(DecompressedData, (int)DecompressedPosition, (int)Entry.Value.DataSize);
                     for(long i = 0; i < Entry.Value.DataSize; i++)
                     {
                         Writer.Write(DecompressedData[DecompressedPosition + i]);
                     }
-                    DecompressedPosition += (int)Entry.Value.DataSize;
+                    DecompressedPosition += Entry.Value.DataSize;
                     Console.Write(" Done!\n");
                 }     
             }
@@ -181,7 +183,11 @@ namespace RFGFormats
                         {
                             System.IO.File.WriteAllBytes(OutputPath + Filenames[Entry.Index], DecompressedData);
                         }
-                        File.ReadBytes(2048 - ((int)File.BaseStream.Position % 2048)); //Alignment Padding
+                        int Remainder = (int)File.BaseStream.Position % 2048;
+                        if(Remainder > 0)
+                        {
+                            File.ReadBytes(2048 - Remainder); //Alignment Padding
+                        }
                         Console.Write(" Done!\n");
                     }
                 }
@@ -197,7 +203,11 @@ namespace RFGFormats
 
                         if (!Condensed)
                         {
-                            File.ReadBytes(2048 - ((int)File.BaseStream.Position % 2048)); //Alignment Padding
+                            int Remainder = (int)File.BaseStream.Position % 2048;
+                            if(Remainder > 0)
+                            {
+                                File.ReadBytes(2048 - Remainder); //Alignment Padding
+                            }
                         }
                         Console.Write(" Done!\n");
                     }

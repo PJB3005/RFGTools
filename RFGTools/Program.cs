@@ -23,14 +23,16 @@ namespace RFGFormats
             if(args.Length > 1)
             {
 
-            }
-            string PackfilePath = @"B:\RFG Unpack\Unpack\unpack1\vehicles_r\civ_truck1.ccar_pc.str2_pc";//@"B:\RFG Unpack\data\misc.vpp_pc";
-            string OutputPath = @"B:\RFG Unpack\Unpack\unpack1\vehicles_r\civ_truck1_alt\";
+            }*/
+            string PackfilePath = @"B:\RFG Unpack\data\terr01_l0.vpp_pc";//@"B:\RFG Unpack\data\misc.vpp_pc";
+            string OutputPath = @"B:\RFG Unpack\Unpack\unpack4\terr01_l0\";
             var Packfile = new Packfile3();
-            Packfile.Deserialize(PackfilePath, OutputPath);*/
+            Packfile.Deserialize(PackfilePath, OutputPath);
 
             //Todo: Validate vpp unpacks, then unpack all str2, get file types, and validate those
-            FileInfo[] DataFolder = new DirectoryInfo(@"B:\RFG Unpack\data\vehicles_r2\").GetFiles();
+
+/*
+            FileInfo[] DataFolder = new DirectoryInfo(@"B:\RFG Unpack\data\").GetFiles();
             foreach(var File in DataFolder)
             {
                 if(File.Extension == ".vpp_pc" || File.Extension == ".str2_pc")
@@ -47,8 +49,9 @@ namespace RFGFormats
                         //MessageBox.Show("Exception caught while unpacking " + File.Name + ": " + Ex.Message);
                     }
                 }
-            }
+            }*/
             Console.WriteLine("Complete. Press any key to close.");
+            //
             Console.ReadKey(); //Waits for keypress to exit.
         }
     }
