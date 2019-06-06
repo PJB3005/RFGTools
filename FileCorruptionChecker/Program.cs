@@ -18,12 +18,14 @@ namespace FileCorruptionChecker
         static string[] IgnoredExtensionList = {".wav", ".txt", ".xml", ".xtbl", ".mtbl", ".lua",
         ".gpeg_pc", ".gvbm_pc", ".gsmesh_pc", ".gtmesh_pc", ".gcmesh_pc", ".gcar_pc", ".xsb_pc",
         ".xwb_pc", ".gefct_pc", ".gterrain_pc", ".vint_proj", ".scriptx", ".fsmib", ".png", ".dds",
-        ".dtodx", ".gtodx", ".NEW", ".gchk_pc", ".vint_xdoc", ".rig_pc"};
+        ".dtodx", ".gtodx", ".NEW", ".gchk_pc", ".vint_xdoc", ".rig_pc", ".gstch_pc"
+        };
 
         static void Main(string[] args)
         { 
             LogFile = new StreamWriter(@"./RFG_File_Validation_Log.txt", false);
-            var Files = new DirectoryInfo(@"B:\RFG Unpack\Unpack\unpack4\");
+            var Files = new DirectoryInfo(@"C:\Users\moneyl\RFG Unpack\Unpack\unpack3\");
+            //var Files = new DirectoryInfo(@"C:\Users\moneyl\RFG Unpack\Gibbed\");
             Console.WriteLine("Checking for corrupted files in " + Files.Name + " and it's sub-folders...");
             WalkDirectoryTree(Files);
 
@@ -32,12 +34,16 @@ namespace FileCorruptionChecker
             LogFile.WriteLine("Number of corrupted files: " + CorruptedFileCount.ToString());
             LogFile.WriteLine("Number of unknown formats: " + UnknownFormatCount.ToString());
             LogFile.WriteLine("Number of ignored files: " + IgnoredFileCount.ToString());
-
+            
             Console.WriteLine("Complete! Results:");
             Console.WriteLine("Number of detected files: " + DetectedFileCount.ToString());
             Console.WriteLine("Number of corrupted files: " + CorruptedFileCount.ToString());
             Console.WriteLine("Number of unknown formats: " + UnknownFormatCount.ToString());
             Console.WriteLine("Number of ignored files: " + IgnoredFileCount.ToString());
+            float PercentageCorrupted = (float)CorruptedFileCount / (float)DetectedFileCount;
+            float MaxPercentageCorrupted = ((float)CorruptedFileCount + (float)IgnoredFileCount) / (float)DetectedFileCount;
+            Console.WriteLine("Percentage corrupted: {0}", PercentageCorrupted);
+            Console.WriteLine("Max percentage corrupted: {0}", MaxPercentageCorrupted);
             Console.WriteLine("Press any key to close.");
             Console.ReadKey(); //Waits for keypress to exit.
         }
@@ -96,7 +102,6 @@ namespace FileCorruptionChecker
                     var Reader = new BinaryReader(Stream);
                     uint Signature = Reader.ReadUInt32();
 
-                    //Unknowns: fsmib, gsmesh, csmesh, ccmesh, xwb_pc, xsb_pc, gterrain_pc
                     if(Extension == ".vpp_pc" || Extension == ".str2_pc")
                     {
                         if(Signature != 1367935694)
@@ -232,15 +237,24 @@ namespace FileCorruptionChecker
                             CorruptedFileCount++;
                         }
                     }
-                    /*else if (Extension == ".rig_pc")
+                    else if(Extension == ".cfmesh_pc")
                     {
-                        if (Signature != 0) //Not 100% confirmed, but all the ones I checked started with 0
+                        if(Signature != 267501985) //0x0FF1C1A1 
                         {
                             Console.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
                             CorruptedFileCount++;
                         }
-                    }*/
+                    }
+                    else if (Extension == ".cterrain_pc")
+                    {
+                        if (Signature != 1381123412) //0x52524554 //TERR
+                        {
+                            Console.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
+                            LogFile.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
+                            CorruptedFileCount++;
+                        }
+                    }
                     else if (File.Name == "bitmaps_pc") //Special case
                     {
                         if (Signature != 5)
@@ -261,7 +275,7 @@ namespace FileCorruptionChecker
                     }
                     else if (Extension == ".rfglocatext")
                     {
-                        if (Signature != 2823585651)
+                        if (Signature != 2823585651) //0xA84C7F73
                         {
                             Console.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
@@ -297,7 +311,7 @@ namespace FileCorruptionChecker
                     }
                     else if (Extension == ".cstch_pc")
                     {
-                        if (Signature != 1902830517)
+                        if (Signature != 2966351781) //Unconfirmed
                         {
                             Console.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
@@ -306,7 +320,7 @@ namespace FileCorruptionChecker
                     }
                     else if (Extension == ".ctmesh_pc")
                     {
-                        if (Signature != 0)
+                        if (Signature != 1514296659) //0x5A425553 or "SUBZ"
                         {
                             Console.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
                             LogFile.WriteLine(File.Directory.Name + "/" + File.Name + " is corrupt, invalid signature for file extension.");
