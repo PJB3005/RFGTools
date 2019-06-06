@@ -46,6 +46,8 @@ namespace RFGFormats
         //Reads the header, directory, and filenames blocks from the file.
         public void Deserialize(string PackfilePath, string OutputPath)
         {
+            var vppName = Path.GetFileName(PackfilePath);
+
             ShortName = new char[65];
             PathName = new char[256];
 
@@ -53,10 +55,17 @@ namespace RFGFormats
             Filenames = new List<string>();
             string PackfileName = Path.GetFileName(PackfilePath);
             System.IO.Directory.CreateDirectory(OutputPath);
+            var FileInfo = new FileInfo(PackfilePath);
             Console.WriteLine("Extracting " + PackfileName + "...");
+            if (FileInfo.Length <= 2048)
+            {
+                Console.WriteLine("Cancelled extraction of {0}. Packfile is empty!", PackfileName);
+                return;
+            }
             Console.WriteLine(PackfileName + "> Reading header data...");
 
             var File = new BinaryReader(new FileStream(PackfilePath, FileMode.Open));
+            
             Signature = File.ReadUInt32();
             if (Signature != 1367935694) //Hex: 0xCE0A8951
             {
@@ -198,18 +207,38 @@ namespace RFGFormats
                     {
                         Console.Write(PackfileName + "> Extracting " + Filenames[Entry.Index].ToString() + "...");
                         byte[] FileData = new byte[Entry.Value.DataSize];
+                        //File.Read(FileData, (int)Entry.Value.DataOffset, (int)Entry.Value.DataSize);
                         File.Read(FileData, 0, (int)Entry.Value.DataSize);
                         System.IO.File.WriteAllBytes(OutputPath + Filenames[Entry.Index], FileData);
-
+                        
                         if (!Condensed)
                         {
-                            int Remainder = (int)File.BaseStream.Position % 2048;
+                            //If you remove the parentheses here you'll break unpacking on terr01_l0.vpp_pc
+                            int Remainder = (int)(File.BaseStream.Position % 2048);
                             if(Remainder > 0)
                             {
                                 File.ReadBytes(2048 - Remainder); //Alignment Padding
                             }
                         }
-                        Console.Write(" Done!\n");
+
+                        var CorruptionCheck = new BinaryReader(new FileStream(OutputPath + Filenames[Entry.Index], FileMode.Open));
+                        uint HeaderValue = CorruptionCheck.ReadUInt32();
+
+                        if (FileInfo.Extension == ".str2_pc")
+                        {
+                            if (HeaderValue == 1367935694)
+                            {
+                                Console.Write(" Done!\n");
+                            }
+                            else
+                            {
+                                Console.Write(" Corrupted! Extraction error! Magic number: {0}\n", HeaderValue);
+                            }
+                        }
+                        else
+                        {
+                            Console.Write(" Done!\n");
+                        }
                     }
                 }
             }
