@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using System.Linq;
 
@@ -20,31 +19,31 @@ namespace RFGFormats
         public List<string> Filenames;
             
         //Reads the header, directory, and filenames blocks from the file.
-        public void Deserialize(string PackfilePath, string OutputPath)
+        public void Deserialize(string packfilePath, string outputPath)
         {
-            string packfileName = Path.GetFileName(PackfilePath);
-            var packfileInfo = new FileInfo(PackfilePath);
+            string packfileName = Path.GetFileName(packfilePath);
+            var packfileInfo = new FileInfo(packfilePath);
             Console.WriteLine("Extracting " + packfileName + "...");
             if (packfileInfo.Length <= 2048)
             {
                 Console.WriteLine("Cancelled extraction of {0}. Packfile is empty!", packfileName);
                 return;
             }
-            Directory.CreateDirectory(OutputPath);
+            Directory.CreateDirectory(outputPath);
             Console.WriteLine(packfileName + "> Reading header data...");
 
-            var File = new BinaryReader(new FileStream(PackfilePath, FileMode.Open));
+            var packfile = new BinaryReader(new FileStream(packfilePath, FileMode.Open));
             Header = new Packfile3Header();
-            Header.Deserialize(File);
+            Header.Deserialize(packfile);
 
             DirectoryEntries = new List<Packfile3DirectoryEntry>();
             for (int i = 0; i < Header.NumberOfFiles; i++)
             {
-                var Entry = new Packfile3DirectoryEntry();
-                Entry.Deserialize(File);
-                DirectoryEntries.Add(Entry);
+                var entry = new Packfile3DirectoryEntry();
+                entry.Deserialize(packfile);
+                DirectoryEntries.Add(entry);
             }
-            File.ReadBytes(2048 - ((int)File.BaseStream.Position % 2048)); //Alignment Padding
+            packfile.ReadBytes(2048 - ((int)packfile.BaseStream.Position % 2048)); //Alignment Padding
 
             Filenames = new List<string>();
             for (int i = 0; i < Header.NumberOfFiles; i++)
@@ -52,45 +51,45 @@ namespace RFGFormats
                 var name = new StringBuilder();
                 do
                 {
-                    name.Append(File.ReadChar());
+                    name.Append(packfile.ReadChar());
                 }
-                while (File.PeekChar() != 0);
+                while (packfile.PeekChar() != 0);
                 Filenames.Add(name.ToString());
-                File.ReadByte(); //Move past null byte
+                packfile.ReadByte(); //Move past null byte
             }
-            File.ReadBytes(2048 - ((int)File.BaseStream.Position % 2048)); //Alignment Padding
+            packfile.ReadBytes(2048 - ((int)packfile.BaseStream.Position % 2048)); //Alignment Padding
 
             if(Header.Compressed && Header.Condensed)
             {
-                DeserializeCompressedAndCondensed(PackfilePath, OutputPath, File);
+                DeserializeCompressedAndCondensed(packfilePath, outputPath, packfile);
             }
             else
             {
                 if(Header.Compressed)
                 {
-                    DeserializeCompressed(PackfilePath, OutputPath, File);
+                    DeserializeCompressed(packfilePath, outputPath, packfile);
                 }
                 else
                 {
-                    DeserializeDefault(PackfilePath, OutputPath, File);
+                    DeserializeDefault(packfilePath, outputPath, packfile);
                 }
             }
         }
 
-        private void DeserializeCompressedAndCondensed(string packfilePath, string outputPath, BinaryReader File)
+        private void DeserializeCompressedAndCondensed(string packfilePath, string outputPath, BinaryReader packfile)
         {
             string packfileName = Path.GetFileName(packfilePath);
             //Inflate whole data block
             byte[] compressedData = new byte[Header.CompressedDataSize];
             byte[] decompressedData = new byte[Header.DataSize];
-            File.Read(compressedData, 0, (int)Header.CompressedDataSize);
+            packfile.Read(compressedData, 0, (int)Header.CompressedDataSize);
 
             int decompressedSizeResult = 0;
-            using (MemoryStream Memory = new MemoryStream(compressedData))
+            using (MemoryStream memory = new MemoryStream(compressedData))
             {
-                using (InflaterInputStream Inflater = new InflaterInputStream(Memory))
+                using (InflaterInputStream inflater = new InflaterInputStream(memory))
                 {
-                    decompressedSizeResult = Inflater.Read(decompressedData, 0, (int)Header.DataSize);
+                    decompressedSizeResult = inflater.Read(decompressedData, 0, (int)Header.DataSize);
                 }
             }
             if (decompressedSizeResult != Header.DataSize)
@@ -118,7 +117,7 @@ namespace RFGFormats
             }
         }
 
-        private void DeserializeCompressed(string packfilePath, string outputPath, BinaryReader File)
+        private void DeserializeCompressed(string packfilePath, string outputPath, BinaryReader packfile)
         {
             string packfileName = Path.GetFileName(packfilePath);
             //Inflate block by block
@@ -127,14 +126,14 @@ namespace RFGFormats
                 Console.Write("{0}> Extracting {1}...", packfileName, Filenames[Entry.Index]);
                 byte[] compressedData = new byte[Entry.Value.CompressedDataSize];
                 byte[] decompressedData = new byte[Entry.Value.DataSize];
-                File.Read(compressedData, 0, (int)Entry.Value.CompressedDataSize);
+                packfile.Read(compressedData, 0, (int)Entry.Value.CompressedDataSize);
 
                 int decompressedSizeResult = 0;
-                using (var Memory = new MemoryStream(compressedData))
+                using (var memory = new MemoryStream(compressedData))
                 {
-                    using (InflaterInputStream Inflater = new InflaterInputStream(Memory))
+                    using (InflaterInputStream inflater = new InflaterInputStream(memory))
                     {
-                        decompressedSizeResult = Inflater.Read(decompressedData, 0, (int)Entry.Value.DataSize);
+                        decompressedSizeResult = inflater.Read(decompressedData, 0, (int)Entry.Value.DataSize);
                     }
                 }
                 if (decompressedSizeResult != Entry.Value.DataSize)
@@ -147,35 +146,35 @@ namespace RFGFormats
                     Console.WriteLine(errorString.ToString());
                     throw new Exception(errorString.ToString());
                 }
-                System.IO.File.WriteAllBytes(outputPath + Filenames[Entry.Index], decompressedData);
+                File.WriteAllBytes(outputPath + Filenames[Entry.Index], decompressedData);
 
-                int remainder = (int)(File.BaseStream.Position % 2048);
+                int remainder = (int)(packfile.BaseStream.Position % 2048);
                 if (remainder > 0)
                 {
-                    File.ReadBytes(2048 - remainder); //Alignment Padding
+                    packfile.ReadBytes(2048 - remainder); //Alignment Padding
                 }
                 Console.WriteLine(" Done!");
             }
         }
 
-        private void DeserializeDefault(string packfilePath, string outputPath, BinaryReader File)
+        private void DeserializeDefault(string packfilePath, string outputPath, BinaryReader packfile)
         {
             string packfileName = Path.GetFileName(packfilePath);
             //Copy data into individual files
             foreach (var Entry in DirectoryEntries.Select((Value, Index) => new { Index, Value }))
             {
                 Console.Write("{0}> Extracting {1}...", packfileName, Filenames[Entry.Index]);
-                byte[] FileData = new byte[Entry.Value.DataSize];
-                File.Read(FileData, 0, (int)Entry.Value.DataSize);
-                System.IO.File.WriteAllBytes(outputPath + Filenames[Entry.Index], FileData);
+                byte[] fileData = new byte[Entry.Value.DataSize];
+                packfile.Read(fileData, 0, (int)Entry.Value.DataSize);
+                File.WriteAllBytes(outputPath + Filenames[Entry.Index], fileData);
 
                 if (!Header.Condensed)
                 {
                     //If you remove the parentheses here you'll break unpacking on terr01_l0.vpp_pc
-                    int remainder = (int)(File.BaseStream.Position % 2048);
+                    int remainder = (int)(packfile.BaseStream.Position % 2048);
                     if (remainder > 0)
                     {
-                        File.ReadBytes(2048 - remainder); //Alignment Padding
+                        packfile.ReadBytes(2048 - remainder); //Alignment Padding
                     }
                 }
                 Console.WriteLine(" Done!");

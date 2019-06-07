@@ -178,10 +178,10 @@ namespace RFGTools.CorruptionChecker
             }
             
             output.WriteLine("Complete! Results:");
-            output.WriteLine("Number of detected files: " + DetectedFileCount.ToString());
-            output.WriteLine("Number of corrupted files: " + CorruptedFileCount.ToString());
-            output.WriteLine("Number of unknown formats: " + UnknownFormatCount.ToString());
-            output.WriteLine("Number of ignored files: " + IgnoredFileCount.ToString());
+            output.WriteLine("Number of detected files: {0}", DetectedFileCount);
+            output.WriteLine("Number of corrupted files: {0}", CorruptedFileCount);
+            output.WriteLine("Number of unknown formats: {0}", UnknownFormatCount);
+            output.WriteLine("Number of ignored files: {0}", IgnoredFileCount);
             float percentageCorrupted = (float)CorruptedFileCount / (float)DetectedFileCount;
             float maxPercentageCorrupted = ((float)CorruptedFileCount + (float)IgnoredFileCount) / (float)DetectedFileCount;
             output.WriteLine("Percentage corrupted: {0}", percentageCorrupted);
