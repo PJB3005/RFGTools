@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FileCorruptionChecker")]
+[assembly: AssemblyTitle("PackfileUnpacker")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FileCorruptionChecker")]
+[assembly: AssemblyProduct("PackfileUnpacker")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1ea9c396-2219-44b8-9352-6ef0baf9fe48")]
+[assembly: Guid("c5d09d03-f6b3-45b3-aafa-3aed1135edea")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace RFGFormats
 {
-    class Packfile3DirectoryEntry
+    public class Packfile3DirectoryEntry
     {
         public uint NameOffset;
         public uint Sector;

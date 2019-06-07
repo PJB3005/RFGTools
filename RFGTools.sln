@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RFGTools", "RFGTools\RFGTools.csproj", "{FEA313FC-F770-4F35-9864-7814E91DD741}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileCorruptionChecker", "FileCorruptionChecker\FileCorruptionChecker.csproj", "{1EA9C396-2219-44B8-9352-6EF0BAF9FE48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackfileUnpacker", "PackfileUnpacker\PackfileUnpacker.csproj", "{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{FEA313FC-F770-4F35-9864-7814E91DD741}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEA313FC-F770-4F35-9864-7814E91DD741}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEA313FC-F770-4F35-9864-7814E91DD741}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EA9C396-2219-44B8-9352-6EF0BAF9FE48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EA9C396-2219-44B8-9352-6EF0BAF9FE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EA9C396-2219-44B8-9352-6EF0BAF9FE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EA9C396-2219-44B8-9352-6EF0BAF9FE48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
