@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,75 +9,149 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using RFGFormats;
 using RFGTools.CorruptionChecker;
+using CommandLine;
 
 namespace PackfileUnpacker
 {
     class Program
     {
+        public class Options
+        {
+            [Value(0, MetaName = "Input", Required = true, HelpText = "Input file or folder.")]
+            public IEnumerable<string> Input { get; set; }
+
+            [Option('v', "verbose", Required = false, HelpText = "Output verbose log messages.")]
+            public bool Verbose { get; set; }
+
+            [Option('r', "recursive", Required = false, HelpText = "After unpacking a packfile, unpack any valid packfiles it contained.")]
+            public bool Recursive { get; set; }
+
+            [Option('s', "search", Required = false, HelpText = "Unpack packfiles in the provided folder and it's subfolders.")]
+            public bool Search { get; set; }
+        }
+
         static void Main(string[] args)
         {
-            /*
-            Args:
-            Default: PackfileUnpacker.exe InputFile [OutputFolder] ... Auto unpacks to folder with the same name if not OutputFolder provided, maybe strip off extension for less confusion
-            -a: Unpack all in folder, args: PackfileUnpacker.exe InputFolder [OutputFolder] ... If no OutputFolder provided, unpack to ./unpack/packfilename, perhaps with extension stripped
-            Consider adding option to auto detect wanted behavior depending on if a folder or file is dropped on it.
-            Have messagebox pop up to confirm action on activities which might take forever.
-            Add verbose option
-            Add recursive unpack option
-            */
+            //Todo: Add warning when unpacking large amount of files or folders
+            //Todo: Add timer
+            //Todo: Add support for custom unpack folder/location
 
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(options =>
+                {
+                    Console.WriteLine("Debug options output:");
+                    Console.WriteLine("Input: {0}", options.Input);
+                    Console.WriteLine("Verbose: {0}", options.Verbose);
+                    //Console.WriteLine("All: {0}", options.All);
+                    Console.WriteLine("Recursive: {0}", options.Recursive);
+                    Console.WriteLine("Search: {0}", options.Search);
 
-            /*
-            if(args.Length > 1)
-            {
+                    foreach (var input in options.Input)
+                    {
+                        if (Directory.Exists(input)) //Check if it's a folder
+                        {
+                            //Since it's a folder, first handle -a and -s options, then -r on each packfile
+                            Console.WriteLine("Input exists and is a directory");
 
-            }*/
+                            FileInfo[] inputFolder = { };
+                            if (options.Search) //Search for packfiles in subfolders and the provided folder
+                            {
+                                inputFolder = new DirectoryInfo(input).GetFiles("*", SearchOption.AllDirectories);
+                            }
+                            else //Only search for packfiles in the provided folder
+                            {
+                                inputFolder = new DirectoryInfo(input).GetFiles();
+                            }
 
+                            foreach (var file in inputFolder)
+                            {
+                                if (file.Extension == ".vpp_pc" || file.Extension == ".str2_pc")
+                                {
+                                    string inputPath = file.FullName;
+                                    string outputPath = file.DirectoryName + "\\Unpack\\" + file.Name + "\\";
 
+                                    try
+                                    {
+                                        var Packfile = new Packfile3(options.Verbose);
+                                        Packfile.Deserialize(inputPath, outputPath);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        MessageBox.Show("Exception caught while unpacking " + file.Name + ": " + ex.Message);
+                                    }
 
+                                    if (options.Recursive)
+                                    {
+                                        //Check OutputPath for valid packfiles and extract them
+                                        FileInfo[] unpackFolder = new DirectoryInfo(outputPath).GetFiles();
+                                        foreach (var subfile in unpackFolder)
+                                        {
+                                            if (subfile.Extension == ".vpp_pc" || subfile.Extension == ".str2_pc")
+                                            {
+                                                try
+                                                {
+                                                    string subInputPath = subfile.FullName;
+                                                    string subOutputPath = subfile.DirectoryName + "\\Subfiles\\" + subfile.Name + "\\";
+                                                    var subPackfile = new Packfile3(options.Verbose);
+                                                    subPackfile.Deserialize(subInputPath, subOutputPath);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    MessageBox.Show("Exception caught while unpacking " + subfile.Name + ": " + ex.Message);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (File.Exists(input)) //Check if it's a file
+                        {
+                            //Since it's a file, can safely ignore -a and -s options
+                            Console.WriteLine("Input exists and is a file!");
 
+                            var PackfileInfo = new FileInfo(input);
+                            string InputPath = input;
+                            string OutputPath = PackfileInfo.DirectoryName + "\\Unpack\\" + PackfileInfo.Name + "\\";
 
+                            try
+                            {
+                                var Packfile = new Packfile3(options.Verbose);
+                                Packfile.Deserialize(InputPath, OutputPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Exception caught while unpacking " + PackfileInfo.Name + ": " + ex.Message);
+                            }
 
-            //string PackfilePath = @"C:\Users\moneyl\RFG Unpack\Unpack\unpack3\activities.vpp_pc\je_ad_01.str2_pc";//@"B:\RFG Unpack\data\misc.vpp_pc";
-            //string OutputPath = @"C:\Users\moneyl\RFG Unpack\Unpack\unpack3\activities.vpp_pc\Subfiles\je_ad_01.str2_pc\";
-            //var Packfile = new Packfile3();
-            //Packfile.Deserialize(PackfilePath, OutputPath);
+                            if (options.Recursive)
+                            {
+                                //Check OutputPath for valid packfiles and extract them
+                                FileInfo[] unpackFolder = new DirectoryInfo(OutputPath).GetFiles();
+                                foreach (var file in unpackFolder)
+                                {
+                                    if (file.Extension == ".vpp_pc" || file.Extension == ".str2_pc")
+                                    {
+                                        try
+                                        {
+                                            string subInputPath = file.FullName;
+                                            string subOutputPath = file.DirectoryName + "\\Subfiles\\" + file.Name + "\\";
+                                            var subPackfile = new Packfile3(options.Verbose);
+                                            subPackfile.Deserialize(subInputPath, subOutputPath);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            MessageBox.Show("Exception caught while unpacking " + file.Name + ": " + ex.Message);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
 
-            //Todo: Validate vpp unpacks, then unpack all str2, get file types, and validate those
-
-
-            var Timer = new Stopwatch();
-            Timer.Start();
-            //FileInfo[] DataFolder = new DirectoryInfo(@"B:\RFG Unpack\data\").GetFiles();
-            FileInfo[] DataFolder =
-                new DirectoryInfo(@"C:\Users\moneyl\RFG Unpack\Unpack\").GetFiles("*",
-                    SearchOption.AllDirectories);
-            //FileInfo[] DataFolder = new DirectoryInfo(@"B:\RFG Unpack\Unpack\unpack2\terr01_l0.vpp_pc\").GetFiles();
-            var Checker = new CorruptionChecker();
-            foreach (var File in DataFolder)
-            {
-                
-                //if (File.Extension == ".vpp_pc")// || File.Extension == ".str2_pc")
-                //{
-                //    try
-                //    {
-                //        var Packfile = new Packfile3();
-                //        string PackfilePath = File.FullName;
-                //        string OutputFolderPath = File.Directory.Parent.FullName + @"\Unpack\unpack3\" + File.Name + @"\";
-                //        Packfile.Deserialize(PackfilePath, OutputFolderPath);
-                //    }
-                //    catch (Exception Ex)
-                //    {
-                //        MessageBox.Show("Exception caught while unpacking " + File.Name + ": " + Ex.Message);
-                //    }
-                //}
-            }
-            Checker.Check(@"C:\Users\moneyl\RFG Unpack\Unpack\", Console.OpenStandardOutput());
-            Timer.Stop();
-            Console.WriteLine("Complete! Time elapsed: {0}ms | {1}s", Timer.Elapsed.TotalMilliseconds, Timer.Elapsed.TotalSeconds);
-            Console.WriteLine("Press any key to close.");
-            //
-            Console.ReadKey(); //Waits for keypress to exit.
+            Console.WriteLine("\nPress any key to close.");
+            Console.ReadKey();
         }
     }
 }
