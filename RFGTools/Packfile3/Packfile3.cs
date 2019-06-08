@@ -17,6 +17,14 @@ namespace RFGFormats
 
         //Filenames block
         public List<string> Filenames;
+
+        //Data below here is only used by the unpacker
+        public bool Verbose = false;
+
+        public Packfile3(bool verbose)
+        {
+            Verbose = verbose;
+        }
             
         //Reads the header, directory, and filenames blocks from the file.
         public void Deserialize(string packfilePath, string outputPath)
@@ -30,7 +38,10 @@ namespace RFGFormats
                 return;
             }
             Directory.CreateDirectory(outputPath);
-            Console.WriteLine(packfileName + "> Reading header data...");
+            if (Verbose)
+            {
+                Console.WriteLine(packfileName + "> Reading header data...");
+            }
 
             var packfile = new BinaryReader(new FileStream(packfilePath, FileMode.Open));
             Header = new Packfile3Header();
@@ -106,14 +117,20 @@ namespace RFGFormats
             foreach (var entry in DirectoryEntries.Select((Value, Index) => new { Index, Value }))
             {
                 long decompressedPosition = entry.Value.DataOffset;
-                Console.Write("{0}> Extracting {1}...", packfileName, Filenames[entry.Index]);
+                if (Verbose)
+                {
+                    Console.Write("{0}> Extracting {1}...", packfileName, Filenames[entry.Index]);
+                }
                 var writer = new BinaryWriter(System.IO.File.Create(outputPath + Filenames[entry.Index]));
 
                 for (long i = 0; i < entry.Value.DataSize; i++)
                 {
                     writer.Write(decompressedData[decompressedPosition + i]);
                 }
-                Console.WriteLine(" Done!");
+                if (Verbose)
+                {
+                    Console.WriteLine(" Done!");
+                }
             }
         }
 
@@ -123,7 +140,10 @@ namespace RFGFormats
             //Inflate block by block
             foreach (var Entry in DirectoryEntries.Select((Value, Index) => new { Index, Value }))
             {
-                Console.Write("{0}> Extracting {1}...", packfileName, Filenames[Entry.Index]);
+                if (Verbose)
+                {
+                    Console.Write("{0}> Extracting {1}...", packfileName, Filenames[Entry.Index]);
+                }
                 byte[] compressedData = new byte[Entry.Value.CompressedDataSize];
                 byte[] decompressedData = new byte[Entry.Value.DataSize];
                 packfile.Read(compressedData, 0, (int)Entry.Value.CompressedDataSize);
@@ -153,7 +173,10 @@ namespace RFGFormats
                 {
                     packfile.ReadBytes(2048 - remainder); //Alignment Padding
                 }
-                Console.WriteLine(" Done!");
+                if (Verbose)
+                {
+                    Console.WriteLine(" Done!");
+                }
             }
         }
 
@@ -163,7 +186,10 @@ namespace RFGFormats
             //Copy data into individual files
             foreach (var Entry in DirectoryEntries.Select((Value, Index) => new { Index, Value }))
             {
-                Console.Write("{0}> Extracting {1}...", packfileName, Filenames[Entry.Index]);
+                if (Verbose)
+                {
+                    Console.Write("{0}> Extracting {1}...", packfileName, Filenames[Entry.Index]);
+                }
                 byte[] fileData = new byte[Entry.Value.DataSize];
                 packfile.Read(fileData, 0, (int)Entry.Value.DataSize);
                 File.WriteAllBytes(outputPath + Filenames[Entry.Index], fileData);
@@ -177,7 +203,10 @@ namespace RFGFormats
                         packfile.ReadBytes(2048 - remainder); //Alignment Padding
                     }
                 }
-                Console.WriteLine(" Done!");
+                if (Verbose)
+                {
+                    Console.WriteLine(" Done!");
+                }
             }
         }
 
