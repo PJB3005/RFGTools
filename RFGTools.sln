@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.489
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RFGTools", "RFGTools\RFGTools.csproj", "{FEA313FC-F770-4F35-9864-7814E91DD741}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackfileUnpacker", "PackfileUnpacker\PackfileUnpacker.csproj", "{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackfilePacker", "PackfilePacker\PackfilePacker.csproj", "{21011E23-6F43-4987-A05E-66932AB31CF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractPEG", "ExtractPEG\ExtractPEG.csproj", "{F84E88AE-7094-4D6B-BB00-2E66B7A43FC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5D09D03-F6B3-45B3-AAFA-3AED1135EDEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21011E23-6F43-4987-A05E-66932AB31CF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21011E23-6F43-4987-A05E-66932AB31CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21011E23-6F43-4987-A05E-66932AB31CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21011E23-6F43-4987-A05E-66932AB31CF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84E88AE-7094-4D6B-BB00-2E66B7A43FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84E88AE-7094-4D6B-BB00-2E66B7A43FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84E88AE-7094-4D6B-BB00-2E66B7A43FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84E88AE-7094-4D6B-BB00-2E66B7A43FC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
