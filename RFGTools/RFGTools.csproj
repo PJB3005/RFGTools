@@ -56,6 +56,15 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.1.0.145, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.1.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedSquish, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fac8b2bfeda84eab, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedSquish.2.0.0.0\lib\net40\ManagedSquish.dll</HintPath>
+    </Reference>
+    <Reference Include="NativeSquish_x64, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fac8b2bfeda84eab, processorArchitecture=AMD64">
+      <HintPath>..\packages\ManagedSquish.2.0.0.0\lib\net40\NativeSquish_x64.dll</HintPath>
+    </Reference>
+    <Reference Include="NativeSquish_x86, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fac8b2bfeda84eab, processorArchitecture=x86">
+      <HintPath>..\packages\ManagedSquish.2.0.0.0\lib\net40\NativeSquish_x86.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -68,9 +77,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CorruptionChecker\CorruptionChecker.cs" />
-    <Compile Include="Packfile3\Packfile3.cs" />
-    <Compile Include="Packfile3\Packfile3DirectoryEntry.cs" />
-    <Compile Include="Packfile3\Packfile3Header.cs" />
+    <Compile Include="Formats\Packfile3\Packfile3.cs" />
+    <Compile Include="Formats\Packfile3\Packfile3DirectoryEntry.cs" />
+    <Compile Include="Formats\Packfile3\Packfile3Header.cs" />
+    <Compile Include="Formats\Peg10\Peg10.cs" />
+    <Compile Include="Formats\Peg10\Peg10Entry.cs" />
+    <Compile Include="Formats\Peg10\PixelFormat.cs" />
+    <Compile Include="Formats\Peg10\TextureFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -89,5 +102,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
