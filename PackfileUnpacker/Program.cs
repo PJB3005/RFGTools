@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using RFGFormats;
-using RFGTools.CorruptionChecker;
 using CommandLine;
+using RFGTools.Formats.Packfile3;
 
 namespace PackfileUnpacker
 {
