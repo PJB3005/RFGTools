@@ -65,6 +65,9 @@
     <Reference Include="NativeSquish_x86, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fac8b2bfeda84eab, processorArchitecture=x86">
       <HintPath>..\packages\ManagedSquish.2.0.0.0\lib\net40\NativeSquish_x86.dll</HintPath>
     </Reference>
+    <Reference Include="SlimShader, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SlimShader.0.2.0\lib\portable-win+net40\SlimShader.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -84,6 +87,7 @@
     <Compile Include="Formats\Peg10\Peg10Entry.cs" />
     <Compile Include="Formats\Peg10\PixelFormat.cs" />
     <Compile Include="Formats\Peg10\TextureFormat.cs" />
+    <Compile Include="Formats\Shaders\fxo_kg7.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
