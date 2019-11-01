@@ -124,7 +124,7 @@ namespace RFGTools.Formats.Packfile3
                 {
                     Console.Write("{0}> Extracting {1}...", packfileName, Filenames[entry.Index]);
                 }
-                var writer = new BinaryWriter(System.IO.File.Create(outputPath + Filenames[entry.Index]));
+                var writer = new BinaryWriter(System.IO.File.Create(Path.Combine(outputPath, Filenames[entry.Index])));
 
                 for (long i = 0; i < entry.Value.DataSize; i++)
                 {
@@ -169,7 +169,7 @@ namespace RFGTools.Formats.Packfile3
                     Console.WriteLine(errorString.ToString());
                     throw new Exception(errorString.ToString());
                 }
-                File.WriteAllBytes(outputPath + Filenames[Entry.Index], decompressedData);
+                File.WriteAllBytes(Path.Combine(outputPath, Filenames[Entry.Index]), decompressedData);
 
                 int remainder = (int)(packfile.BaseStream.Position % 2048);
                 if (remainder > 0)
@@ -195,7 +195,7 @@ namespace RFGTools.Formats.Packfile3
                 }
                 byte[] fileData = new byte[Entry.Value.DataSize];
                 packfile.Read(fileData, 0, (int)Entry.Value.DataSize);
-                File.WriteAllBytes(outputPath + Filenames[Entry.Index], fileData);
+                File.WriteAllBytes(Path.Combine(outputPath, Filenames[Entry.Index]), fileData);
 
                 if (!Header.Condensed)
                 {

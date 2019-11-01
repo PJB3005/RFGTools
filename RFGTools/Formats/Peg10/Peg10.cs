@@ -73,7 +73,7 @@ namespace RFGTools.Formats.Peg10
                 gpuFileExtension = ".gvbm_pc";
             }
 
-            string gpuFileInputPath = Path.GetDirectoryName(inputPath) + "\\" + Path.GetFileNameWithoutExtension(inputPath) + gpuFileExtension;
+            string gpuFileInputPath = Path.Combine(Path.GetDirectoryName(inputPath), Path.GetFileNameWithoutExtension(inputPath) + gpuFileExtension);
             string inputFileName = Path.GetFileName(inputPath);
 
             var dataReader = new BinaryReader(new FileStream(gpuFileInputPath, FileMode.Open));
@@ -86,10 +86,10 @@ namespace RFGTools.Formats.Peg10
                 var decompressedGpuData = ManagedSquish.Squish.DecompressImage(gpuData, entry.Value.Width,
                     entry.Value.Height, SquishFlags.Dxt5); //This crashes for some reason. WIP
 
-                Directory.CreateDirectory(outputPath + "\\" + inputFileName + "\\");
-                Directory.CreateDirectory(outputPath + "\\" + inputFileName + "_decompressed\\");
-                File.WriteAllBytes(outputPath + "\\" + inputFileName + "\\" + Filenames[entry.Index], gpuData);
-                File.WriteAllBytes(outputPath + "\\" + inputFileName + "_decompressed\\" + Filenames[entry.Index], decompressedGpuData);
+                Directory.CreateDirectory(Path.Combine(outputPath, inputFileName));
+                Directory.CreateDirectory(Path.Combine(outputPath, inputFileName + "_decompressed"));
+                File.WriteAllBytes(Path.Combine(outputPath, inputFileName, Filenames[entry.Index]), gpuData);
+                File.WriteAllBytes(Path.Combine(outputPath, inputFileName + "_decompressed", Filenames[entry.Index]), decompressedGpuData);
             }
         }
     }

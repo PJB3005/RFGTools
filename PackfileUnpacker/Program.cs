@@ -62,7 +62,7 @@ namespace PackfileUnpacker
                                 if (file.Extension == ".vpp_pc" || file.Extension == ".str2_pc")
                                 {
                                     string inputPath = file.FullName;
-                                    string outputPath = file.DirectoryName + "\\Unpack\\" + file.Name + "\\";
+                                    string outputPath = Path.Combine(file.DirectoryName, "Unpack", file.Name);
 
                                     try
                                     {
@@ -85,7 +85,7 @@ namespace PackfileUnpacker
                                                 try
                                                 {
                                                     string subInputPath = subfile.FullName;
-                                                    string subOutputPath = subfile.DirectoryName + "\\Subfiles\\" + subfile.Name + "\\";
+                                                    string subOutputPath = Path.Combine(subfile.DirectoryName, "Subfiles", subfile.Name);
                                                     var subPackfile = new Packfile3(options.Verbose);
                                                     subPackfile.Deserialize(subInputPath, subOutputPath);
                                                 }
@@ -106,7 +106,7 @@ namespace PackfileUnpacker
 
                             var PackfileInfo = new FileInfo(input);
                             string InputPath = input;
-                            string OutputPath = PackfileInfo.DirectoryName + "\\Unpack\\" + PackfileInfo.Name + "\\";
+                            string OutputPath = Path.Combine(PackfileInfo.DirectoryName, "Unpack", PackfileInfo.Name);
 
                             try
                             {
@@ -129,7 +129,7 @@ namespace PackfileUnpacker
                                         try
                                         {
                                             string subInputPath = file.FullName;
-                                            string subOutputPath = file.DirectoryName + "\\Subfiles\\" + file.Name + "\\";
+                                            string subOutputPath = Path.Combine(file.DirectoryName, "Subfiles", file.Name);
                                             var subPackfile = new Packfile3(options.Verbose);
                                             subPackfile.Deserialize(subInputPath, subOutputPath);
                                         }
